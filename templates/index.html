@@ -1,0 +1,70 @@
+<!doctype html>
+<head>
+  <title>Charles Darwin Letters</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <style>
+    select {
+      margin-bottom: 20px;
+      margin-top: 10px;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-8">
+        <select id="select" name="item_id">
+        </select>
+      </div>
+      <div class="col-4"></div>
+    </div>
+    <div class="row">
+      <div class="col-8">
+        <p id=result></p>
+      </div>
+      <div class="col-4">
+        <ul id="mcw"></ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    var items = {{data | safe}}
+
+    function refresh(data) {
+      $("#mcw").empty()
+      for (i in data.mcw) {
+        word = data.mcw[i][0];
+        count = data.mcw[i][1];
+        $("#mcw").append('<li>' +  word + ", " + count + "</li>");
+      }
+      $("#result").text(data.result.fullText);
+    }
+
+    for (i in items) {
+      $("#select").append('<option value=' + items[i].id + '>' + items[i].title + '</option>');
+    }
+
+    $(function() {
+      $.getJSON('/background_process', {
+        item_id: $('select[name="item_id"]').val(),
+      }, function(data) {
+        refresh(data);
+      });
+      return false;
+    });
+
+    $(function() {
+      $('#select').on('change',function(){
+      $.getJSON('/background_process', {
+        item_id: $('select[name="item_id"]').val(),
+      }, function(data) {
+        refresh(data);
+      });
+      return false;
+      });
+    });
+  </script>
+
+</body>
